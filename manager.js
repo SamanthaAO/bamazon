@@ -25,7 +25,7 @@ connection.connect(function (err) {
 });
 
 function showMenu() {
-    
+
     inquirer
         .prompt([{
             type: "list",
@@ -37,19 +37,19 @@ function showMenu() {
         }
         ])
         .then(function (answer) {
-            
-            switch(answer.managerOption){
+
+            switch (answer.managerOption) {
                 case "View Products for Sale":
-                readProducts();
-                break;
+                    readProducts();
+                    break;
 
                 case "View Low Inventory":
-                readLowInventory();
-                break;
+                    readLowInventory();
+                    break;
 
                 case "Add to Inventory":
-                updateInventory();
-                break;
+                    identifyItem();
+                    break;
 
                 // case "Add New Product":
                 // updateProducts();
@@ -57,135 +57,143 @@ function showMenu() {
 
             }
         })
-    }
+}
 
 
-        function readProducts(){
-            console.log("Selecting all products...\n");
-            connection.query("SELECT * FROM products", function (err, res) {
-                //displays all the products
-                //callback(res);
-                if (err) throw err;
-                displayAll(res);
-                connection.end();
-        });
-    }
+function readProducts() {
+    console.log("Selecting all products...\n");
+    connection.query("SELECT * FROM products", function (err, res) {
+        //displays all the products
+        //callback(res);
+        if (err) throw err;
+        displayAll(res);
+        connection.end();
+    });
+}
 
-        function displayAll(res){
-            var itemArray =[];
-            res.forEach(function (element) {
-                var price = priceSymbol(element.price);
-                var itemInfo = "Item ID: " + element.item_id + " | Name: " + element.product_name + " | Price: " + price+ " | Stock Quantity: " + element.stock_quantity;
-                itemArray.push(itemInfo);
-                console.log(itemInfo);
-            })
-            return itemArray;
-        }
+function displayAll(res) {
+    var itemArray = [];
+    res.forEach(function (element) {
+        var price = priceSymbol(element.price);
+        var itemInfo = "Item ID: " + element.item_id + " | Name: " + element.product_name + " | Price: " + price + " | Stock Quantity: " + element.stock_quantity;
+        itemArray.push(itemInfo);
+        console.log(itemInfo);
+    })
+    return itemArray;
+}
 
-        function priceSymbol(x) {
-            var price = new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(x);
-            return price;
-        }
+function priceSymbol(x) {
+    var price = new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(x);
+    return price;
+}
 
-        function readLowInventory(){
-            console.log("Selecting products with low inventory...\n");
-            connection.query("SELECT * FROM products WHERE stock_quantity < 5", function (err, res) {
-                //displays all the products
-                //callback(res);
-                if (err) throw err;
-                displayAll(res);
-                connection.end();
-        });
-        };
+function readLowInventory() {
+    console.log("Selecting products with low inventory...\n");
+    connection.query("SELECT * FROM products WHERE stock_quantity < 5", function (err, res) {
+        //displays all the products
+        //callback(res);
+        if (err) throw err;
+        displayAll(res);
+        connection.end();
+    });
+};
 
-        function updateInventory(){
-            console.log("Selecting all products...\n");
-            connection.query("SELECT * FROM products", function (err, res) {
-                //displays all te products
-                var choices = displayAll(res);
-                //var itemList = res.length attempted to use fo validate;
-                //var answer;
-                if (err) throw err;
-                inquirer
-                    .prompt([{
-                        type: "list",
-                        name: "stockOption",
-                        message: "Please select the item you would like to update the stock on",
-                        choices: choices
-        
-        
-                    },
-                    {
-                        type: "number",
-                        name: "stockAdded",
-                        message: "How many would you like to add?",
-                        validate: validateNumber
+function identifyItem() {
+    console.log("Selecting all products...\n");
+    connection.query("SELECT * FROM products", function (err, res) {
+        //displays all te products
+        var choices = displayAll(res);
+        //var itemList = res.length attempted to use fo validate;
+        //var answer;
+        if (err) throw err;
+        inquirer
+            .prompt([{
+                type: "list",
+                name: "stockOption",
+                message: "Please select the item you would like to update the stock on",
+                choices: choices
+
+
+            },
+            {
+                type: "number",
+                name: "stockAdded",
+                message: "How many would you like to add?",
+                validate: validateNumber
+            }
+
+
+
+            ])
+            .then(function (answer) {
+                var chosenItemID = choices.indexOf(answer.stockOption) + 1;
+                for (var i = 0; i < res.length; i++) {
+                    if (res[i].item_id == chosenItemID) {
+                        chosenItem = res[i];
                     }
-        
-        
-        
-                    ])
-                    .then(function (answer) {
-                        var chosenItemID;
+                }
+                console.log(chosenItem);
 
-                        console.log(choices.indexOf(answer.stockOption);
-                        // for (var i = 0; i < res.length; i++) {
-                        //     if (res[i].item_id == answer.IDPurchased) {
-                        //         chosenItem = res[i];
-                        //     }
-                        // }
-                        // console.log(chosenItem);
-        
-                        // if (chosenItem.stock_quantity >= answer.quantityPurchased) {
-                        //     var total = priceSymbol(chosenItem.price * answer.quantityPurchased)
-                        //     console.log("Congratulations you have purchased " + answer.quantityPurchased + " " + chosenItem.product_name + "s. Your total comes to " + total + ".");
-                        //     updateProducts(chosenItem, answer);
-                        //     console.log(chosenItem)
-        
-                        // }
-                        // else {
-                        //     console.log("I am so sorry for the inconvienience, but we do not currently have the stock to fill you order of " + chosenItem.product_name + "s.")
-                        // }
-        
-        
-                    });
-        
-                //console.log(res[i].item_id + ": " + res[i].product_name);
-        
+                updateInventory(answer);
+
+
+
+                // if (chosenItem.stock_quantity >= answer.quantityPurchased) {
+                //     var total = priceSymbol(chosenItem.price * answer.quantityPurchased)
+                //     console.log("Congratulations you have purchased " + answer.quantityPurchased + " " + chosenItem.product_name + "s. Your total comes to " + total + ".");
+                //     updateProducts(chosenItem, answer);
+                //     console.log(chosenItem)
+
+                // }
+                // else {
+                //     console.log("I am so sorry for the inconvienience, but we do not currently have the stock to fill you order of " + chosenItem.product_name + "s.")
+                // }
+
+
             });
 
+        //console.log(res[i].item_id + ": " + res[i].product_name);
 
-            
+    });
 
-        };
 
-        function validateNumber(answer) {
 
-            var reg = /^\d+$/;
-            return reg.test(answer) || "Please input a number!";
-        
+
+};
+
+function validateNumber(answer) {
+
+    var reg = /^\d+$/;
+    return reg.test(answer) || "Please input a number!";
+
+}
+
+function updateInventory(answer) {
+    connection.query(
+        "UPDATE products SET ? WHERE ?",
+        [
+            {
+                stock_quantity: chosenItem.stock_quantity + answer.stockAdded
+            },
+            {
+                item_id: chosenItem.item_id
+            }
+        ],
+        function (error) {
+            if (error) throw error;
+            console.log("Transaction Complete");
+            connection.end();
         }
-        
+    );
+}
+
+
+
         // function updateProducts(){
 
         // };
 
-        
 
 
 
 
-
-
-// {
-//                 type: "list",
-//                 name: "shopItems",
-//                 message: "Please select a product from the list below that you would like to purchase.",
-//                 choices: function choices() {
-//                     var displayArray = [];
-//                     res.forEach(function (element) {
-//                         displayArray.push(element.item_id + ": " + element.product_name)
-//                     })
-//                     return displayArray;
-//                 },
-//             },

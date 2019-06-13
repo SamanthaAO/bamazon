@@ -28,8 +28,33 @@ function readProducts() {
     console.log("Selecting all products...\n");
     connection.query("SELECT * FROM products", function(err, res) {
       if (err) throw err;
-      // Log all results of the SELECT statement
-      console.log(res);
+      inquirer
+      .prompt([{
+          type: "list",
+          name: "ShopItems",
+          message: "Please select a product from the list below that you would liek to purchase.",
+          choices: function choices(){
+              var displayArray = [];
+              res.forEach(function(element){
+                displayArray.push(element.item_id + ": " + element.product_name)
+              })
+              return displayArray;
+          },
+      },
+      {
+          type: "input",
+          name: "quantityPurchased",
+          message: "How many would you like to purchse?"
+      }
+
+
+
+      ])
+      .then(function(answer) {
+
+      });
+
+      //console.log(res[i].item_id + ": " + res[i].product_name);
       connection.end();
     });
   }

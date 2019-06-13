@@ -29,11 +29,12 @@ function readProducts() {
     connection.query("SELECT * FROM products", function (err, res) {
         //displays all te products
         displayAll(res);
+        var itemList = res.length;
         //var answer;
         if (err) throw err;
         inquirer
             .prompt([{
-                type: "input",
+                type: "number",
                 name: "IDPurchased",
                 message: "What is the ID of the item that you would like to purchase?",
                 validate: validateNumber
@@ -41,7 +42,7 @@ function readProducts() {
 
             },
             {
-                type: "input",
+                type: "number",
                 name: "quantityPurchased",
                 message: "How many would you like to purchse?",
                 validate: validateNumber
@@ -59,21 +60,22 @@ function readProducts() {
                 }
                 console.log(chosenItem);
 
-                if(chosenItem.stock_quantity > answer.quantityPurchased){
+                if (chosenItem.stock_quantity >= answer.quantityPurchased) {
                     var total = priceSymbol(chosenItem.price * answer.quantityPurchased)
-                    
-                    console.log("Congratulations you have pruchased "+ answer.quantityPurchased + " " + chosenItem.product_name +"s. Your total comes to "+ total +" Have a nice day!")
+                    console.log("Congratulations you have purchased " + answer.quantityPurchased + " " + chosenItem.product_name + "s. Your total comes to " + total + ".");
+                    updateProducts(chosenItem, answer);
+                    console.log(chosenItem)
+
                 }
-                else{
+                else {
                     console.log("I am so sorry for the inconvienience, but we do not currently have the stock to fill you order of " + chosenItem.product_name + "s.")
                 }
 
-                //if(chosenItem)
 
             });
 
         //console.log(res[i].item_id + ": " + res[i].product_name);
-        connection.end();
+
     });
 }
 
@@ -85,12 +87,64 @@ function displayAll(res) {
 }
 
 
-function priceSymbol(x){
+function priceSymbol(x) {
     var price = new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(x);
     return price;
 }
 
 function validateNumber(answer) {
+
     var reg = /^\d+$/;
     return reg.test(answer) || "Please input a number!";
+
+}
+
+// function validateIDOnList(answer, itemList) {
+
+//         if (isNaN(answer) === false && parseInt(answer) > 0 && parseInt(answer) <= itemList) {
+//             return true;
+//         }
+//         return "Please input a number that is on the list!";
+// }
+
+function updateProducts(chosenItem, answer) {
+    connection.query(
+        "UPDATE products SET ? WHERE ?",
+        [
+            {
+                stock_quantity: chosenItem.stock_quantity - answer.quantityPurchased
+            },
+            {
+                item_id: chosenItem.item_id
+            }
+        ],
+        function (error) {
+            if (error) throw error;
+            console.log("Transaction Complete");
+            anotherPurchase();
+        }
+    );
+}
+
+function anotherPurchase() {
+
+    inquirer
+        .prompt([
+            {
+                name: "confirm",
+                type: "confirm",
+                message: "Would you like to make another purchase?"
+            }
+        ])
+        .then(function (answer) {
+            if (answer.confirm == true) {
+                readProducts();
+            }
+            else {
+                console.log("Have a Nice Day");
+                connection.end();
+            }
+
+        });
+
 }

@@ -29,7 +29,7 @@ function readProducts() {
     connection.query("SELECT * FROM products", function (err, res) {
         //displays all te products
         displayAll(res);
-        var itemList = res.length;
+        //var itemList = res.length attempted to use fo validate;
         //var answer;
         if (err) throw err;
         inquirer

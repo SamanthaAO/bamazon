@@ -51,9 +51,9 @@ function showMenu() {
                     identifyItem();
                     break;
 
-                // case "Add New Product":
-                // updateProducts();
-                // break;
+                case "Add New Product":
+                    updateProducts();
+                    break;
 
             }
         })
@@ -137,22 +137,7 @@ function identifyItem() {
                 updateInventory(answer);
 
 
-
-                // if (chosenItem.stock_quantity >= answer.quantityPurchased) {
-                //     var total = priceSymbol(chosenItem.price * answer.quantityPurchased)
-                //     console.log("Congratulations you have purchased " + answer.quantityPurchased + " " + chosenItem.product_name + "s. Your total comes to " + total + ".");
-                //     updateProducts(chosenItem, answer);
-                //     console.log(chosenItem)
-
-                // }
-                // else {
-                //     console.log("I am so sorry for the inconvienience, but we do not currently have the stock to fill you order of " + chosenItem.product_name + "s.")
-                // }
-
-
             });
-
-        //console.log(res[i].item_id + ": " + res[i].product_name);
 
     });
 
@@ -181,7 +166,7 @@ function updateInventory(answer) {
         ],
         function (error) {
             if (error) throw error;
-            console.log("Transaction Complete");
+            console.log("Stock added.");
             connection.end();
         }
     );
@@ -189,9 +174,62 @@ function updateInventory(answer) {
 
 
 
-        // function updateProducts(){
+function updateProducts() {
+    inquirer
+        .prompt([
+            {
+                type: "input",
+                name: "name",
+                message: "Name of the Product:",
+            },
+            {
+                type: "input",
+                name: "departmentName",
+                message: "Name of the Department the product is in:",
+            },
+            {
+                type: "number",
+                name: "price",
+                message: "Price:",
+                validate: validateNumber
+            },
+            {
+                type: "number",
+                name: "stock",
+                message: "Quantity in Stock:",
+                validate: validateNumber
+            }
+        ])
+        .then(function (answer) {
+            connection.query(
+                "INSERT INTO products SET ? ",
+                [
+                    {
+                        product_name: answer.name,
+                        department_name: answer.departmentName,
+                        price: answer.price,
+                        stock_quantity: answer.stock
+        
+                    }
+                ],
+                function (error) {
+                    if (error) throw error;
+                    console.log("Product added.");
+                    connection.end();
+                }
+            );
 
-        // };
+
+        });
+
+
+
+
+
+
+    
+
+};
 
 
 

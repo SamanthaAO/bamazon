@@ -175,6 +175,18 @@ function updateInventory(answer) {
 
 
 function updateProducts() {
+    
+        var departmentArray = [];
+        connection.query("SELECT * FROM products", function (err, res) {
+            res.forEach(function (element) {
+                var departement = element.department_name
+                if (departmentArray.indexOf(departement) == -1){
+                departmentArray.push(departement)
+            }
+            })
+            return departmentArray;
+        })
+
     inquirer
         .prompt([
             {
@@ -183,9 +195,10 @@ function updateProducts() {
                 message: "Name of the Product:",
             },
             {
-                type: "input",
+                type: "list",
                 name: "departmentName",
-                message: "Name of the Department the product is in:",
+                message: "Select the Department the product is in:",
+                choices: departmentArray,
             },
             {
                 type: "number",
@@ -209,7 +222,7 @@ function updateProducts() {
                         department_name: answer.departmentName,
                         price: answer.price,
                         stock_quantity: answer.stock
-        
+
                     }
                 ],
                 function (error) {

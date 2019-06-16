@@ -58,7 +58,7 @@ function readProducts() {
                         chosenItem = res[i];
                     }
                 }
-                console.log(chosenItem);
+                //console.log(chosenItem);
 
                 if (chosenItem.stock_quantity >= answer.quantityPurchased) {
                     var total = priceSymbol(chosenItem.price * answer.quantityPurchased)
@@ -84,7 +84,9 @@ function displayAll(res) {
     res.forEach(function (element) {
         var price = priceSymbol(element.price)
         console.log("Item ID: " + element.item_id + " | Name: " + element.product_name + " | Price: " + price)
+        
     })
+    console.table(res);
 }
 
 

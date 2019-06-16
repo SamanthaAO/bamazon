@@ -23,3 +23,16 @@ VALUES ("Poké Ball", "Balls", 200.00, 4), ("Great Ball", "Balls", 600.00, 4), (
   ("Burn Heal", "Healing", 250.00, 4), ("Ice Heal", "Healing", 250.00, 4), ("Full Heal", "Healing", 600.00, 4),
   ("Escape Rope", "Items", 550.00, 4), ("Repel", "Repelents", 350.00, 4), ("Super Repel", "Repelents", 500.00, 4),
   ("Max Repel", "Repelents", 700.00, 4)
+
+-- creates departments table
+CREATE TABLE departments (
+  department_id INT NOT NULL AUTO_INCREMENT,
+  department_name VARCHAR(45) NULL,
+  over_head_costs DECIMAL(6,2) NULL,
+  PRIMARY KEY (item_id)
+);
+
+
+-- add products to table
+INSERT INTO departments (department_name, over_head_costs)
+VALUES ("Balls", 500.00), ("Potions", 600.00),("Cures", 550.00),("Healing", 100.00),("Items", 400.00),("Repelents", 400.00), ("Pokémon", 1000.00)

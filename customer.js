@@ -44,7 +44,7 @@ function readProducts() {
             {
                 type: "number",
                 name: "quantityPurchased",
-                message: "How many would you like to purchse?",
+                message: "How many would you like to purchase?",
                 validate: validateNumber
             }
 
@@ -69,6 +69,7 @@ function readProducts() {
                 }
                 else {
                     console.log("I am so sorry for the inconvienience, but we do not currently have the stock to fill you order of " + chosenItem.product_name + "s.")
+                    anotherPurchase();
                 }
 
 

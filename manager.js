@@ -67,7 +67,7 @@ function readProducts() {
         //callback(res);
         if (err) throw err;
         displayAll(res);
-        connection.end();
+        anotherAction();
     });
 }
 
@@ -94,7 +94,7 @@ function readLowInventory() {
         //callback(res);
         if (err) throw err;
         displayAll(res);
-        connection.end();
+        anotherAction();
     });
 };
 
@@ -132,7 +132,7 @@ function identifyItem() {
                         chosenItem = res[i];
                     }
                 }
-                console.log(chosenItem);
+                //console.log(chosenItem);
 
                 updateInventory(answer);
 
@@ -167,7 +167,7 @@ function updateInventory(answer) {
         function (error) {
             if (error) throw error;
             console.log("Stock added.");
-            connection.end();
+            anotherAction();
         }
     );
 }
@@ -215,21 +215,38 @@ function updateProducts() {
                 function (error) {
                     if (error) throw error;
                     console.log("Product added.");
-                    connection.end();
+                    anotherAction();
                 }
             );
 
 
         });
-
-
-
-
-
-
-    
-
 };
+
+
+
+function anotherAction() {
+
+    inquirer
+        .prompt([
+            {
+                name: "confirm",
+                type: "confirm",
+                message: "Would you like to complete another action?"
+            }
+        ])
+        .then(function (answer) {
+            if (answer.confirm == true) {
+                showMenu();
+            }
+            else {
+                console.log("Goodbye.");
+                connection.end();
+            }
+
+        });
+
+}
 
 
 

@@ -177,12 +177,12 @@ function updateInventory(answer) {
 function updateProducts() {
     
         var departmentArray = [];
-        connection.query("SELECT * FROM products", function (err, res) {
+        connection.query(`SELECT DISTINCT p.department_id, department_name
+        From products as p
+        INNER Join departments as d
+        ON p.department_id = d.department_id`, function (err, res) {
             res.forEach(function (element) {
-                var departement = element.department_name
-                if (departmentArray.indexOf(departement) == -1){
-                departmentArray.push(departement)
-            }
+                departmentArray.push({name: element.department_name, value: element.department_id})
             })
             return departmentArray;
         })
@@ -196,7 +196,7 @@ function updateProducts() {
             },
             {
                 type: "list",
-                name: "departmentName",
+                name: "departmentID",
                 message: "Select the Department the product is in:",
                 choices: departmentArray,
             },
@@ -219,7 +219,7 @@ function updateProducts() {
                 [
                     {
                         product_name: answer.name,
-                        department_name: answer.departmentName,
+                        department_id: answer.departmentID,
                         price: answer.price,
                         stock_quantity: answer.stock
 

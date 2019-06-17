@@ -1,0 +1,2 @@
+console.table(res);
+

@@ -3,6 +3,10 @@ var inquirer = require("inquirer");
 require("dotenv").config();
 var key = require("./keys.js");
 var password = key.password.password;
+var itemList;
+
+
+
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -29,7 +33,7 @@ function readProducts() {
     connection.query("SELECT * FROM products", function (err, res) {
         //displays all te products
         displayAll(res);
-        //var itemList = res.length attempted to use fo validate;
+        itemList = res.length;
         //var answer;
         if (err) throw err;
         inquirer
@@ -37,7 +41,7 @@ function readProducts() {
                 type: "number",
                 name: "IDPurchased",
                 message: "What is the ID of the item that you would like to purchase?",
-                validate: validateNumber
+                validate: validateIDOnList
 
 
             },
@@ -64,7 +68,7 @@ function readProducts() {
                     var total = priceSymbol(chosenItem.price * answer.quantityPurchased)
                     console.log("Congratulations you have purchased " + answer.quantityPurchased + " " + chosenItem.product_name + "s. Your total comes to " + total + ".");
                     updateProducts(chosenItem, answer);
-                    console.log(chosenItem)
+                    //console.log(chosenItem)
 
                 }
                 else {
@@ -86,7 +90,7 @@ function displayAll(res) {
         console.log("Item ID: " + element.item_id + " | Name: " + element.product_name + " | Price: " + price)
         
     })
-    console.table(res);
+    //console.table(res);
 }
 
 
@@ -102,13 +106,13 @@ function validateNumber(answer) {
 
 }
 
-// function validateIDOnList(answer, itemList) {
+function validateIDOnList(answer) {
 
-//         if (isNaN(answer) === false && parseInt(answer) > 0 && parseInt(answer) <= itemList) {
-//             return true;
-//         }
-//         return "Please input a number that is on the list!";
-// }
+        if (isNaN(answer) === false && parseInt(answer) > 0 && parseInt(answer) <= itemList) {
+            return true;
+        }
+        return "Please input a number that is on the list!";
+}
 
 function updateProducts(chosenItem, answer) {
     connection.query(
@@ -125,6 +129,21 @@ function updateProducts(chosenItem, answer) {
             if (error) throw error;
             console.log("Transaction Complete");
             anotherPurchase();
+        }
+    );
+    connection.query(
+        "UPDATE products SET ? WHERE ?",
+        [
+            {
+                product_sales: chosenItem.product_sales + answer.quantityPurchased * chosenItem.price
+            },
+            {
+                item_id: chosenItem.item_id
+            }
+        ],
+        function (error) {
+            if (error) throw error;
+            
         }
     );
 }

@@ -177,10 +177,8 @@ function updateInventory(answer) {
 function updateProducts() {
     
         var departmentArray = [];
-        connection.query(`SELECT DISTINCT p.department_id, department_name
-        From products as p
-        INNER Join departments as d
-        ON p.department_id = d.department_id`, function (err, res) {
+        connection.query(`SELECT department_id, department_name FROM departments`,
+         function (err, res) {
             res.forEach(function (element) {
                 departmentArray.push({name: element.department_name, value: element.department_id})
             })

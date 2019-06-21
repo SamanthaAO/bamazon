@@ -18,7 +18,7 @@ type in node followed by customer.js
 
 from this screen you will be able to view all of the products and place an order. You will then be told if your purchase has been successful or if we do not currently have the stock that you requested. The id that is selected will be confirmed to be a number that is included in the list that is provided, and the value entered will be confirmed to be a valid integer number before it is checked against the stock to se if the items requested can be purchased.
 
-![customer info](video/customer.mp4)
+![customer info](video/customer.gif)
 
 ## Manager View Port
 

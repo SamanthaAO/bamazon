@@ -175,12 +175,12 @@ function updateInventory(answer) {
 
 
 function updateProducts() {
-    
-        var departmentArray = [];
-        connection.query(`SELECT department_id, department_name FROM departments`,
-         function (err, res) {
+
+    var departmentArray = [];
+    connection.query(`SELECT department_id, department_name FROM departments`,
+        function (err, res) {
             res.forEach(function (element) {
-                departmentArray.push({name: element.department_name, value: element.department_id})
+                departmentArray.push({ name: element.department_name, value: element.department_id })
             })
             return departmentArray;
         })

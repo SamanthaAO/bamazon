@@ -1,13 +1,16 @@
+//initiates node packages
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 require("dotenv").config();
+
+//creates global variables
 var key = require("./keys.js");
 var password = key.password.password;
 var itemList;
 
 
 
-
+//connects to sql server
 var connection = mysql.createConnection({
     host: "localhost",
 
@@ -22,20 +25,29 @@ var connection = mysql.createConnection({
     database: "bamazonDB"
 });
 
+//when connected will then run read products so user sees all available products
 connection.connect(function (err) {
+    //if there is an error say so 
     if (err) throw err;
+    //tell the id it is connected at
     console.log("connected as id " + connection.threadId + "\n");
+    //runs readProducts
     readProducts();
 });
 
+//displays all the possible products to user
 function readProducts() {
     console.log("Selecting all products...\n");
+    //selects all iteems from products
     connection.query("SELECT * FROM products", function (err, res) {
-        //displays all te products
+        //displays all the products
         displayAll(res);
+        //updates definition of itemlist so that we know the length of numbeers for validation
         itemList = res.length;
-        //var answer;
+        
         if (err) throw err;
+
+        //inquirer asks for id# and quantity
         inquirer
             .prompt([{
                 type: "number",
@@ -57,6 +69,7 @@ function readProducts() {
             ])
             .then(function (answer) {
                 var chosenItem;
+                //runs though the results and 
                 for (var i = 0; i < res.length; i++) {
                     if (res[i].item_id == answer.IDPurchased) {
                         chosenItem = res[i];
@@ -88,9 +101,9 @@ function displayAll(res) {
     res.forEach(function (element) {
         var price = priceSymbol(element.price)
         console.log("Item ID: " + element.item_id + " | Name: " + element.product_name + " | Price: " + price)
-        
+
     })
-    //console.table(res);
+
 }
 
 
@@ -108,10 +121,10 @@ function validateNumber(answer) {
 
 function validateIDOnList(answer) {
 
-        if (isNaN(answer) === false && parseInt(answer) > 0 && parseInt(answer) <= itemList) {
-            return true;
-        }
-        return "Please input a number that is on the list!";
+    if (isNaN(answer) === false && parseInt(answer) > 0 && parseInt(answer) <= itemList) {
+        return true;
+    }
+    return "Please input a number that is on the list!";
 }
 
 function updateProducts(chosenItem, answer) {
@@ -143,7 +156,7 @@ function updateProducts(chosenItem, answer) {
         ],
         function (error) {
             if (error) throw error;
-            
+
         }
     );
 }

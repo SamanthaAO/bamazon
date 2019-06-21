@@ -41,9 +41,9 @@ VALUES ("Balls", 500.00), ("Potions", 600.00),("Cures", 550.00),
 
 
 --to be used in supervisors.js
-SELECT d.*, SUM(product_sales) as product_sales, SUM(product_sales) - d.over_head_costs as total_sales
-FROM products as p
-INNER JOIN departments as d
-ON p.department_id = d.department_id
-GROUP BY p.department_id
+SELECT d.*, SUM(product_sales) as product_sales, SUM(product_sales) - d.over_head_costs as total_pofit
+    FROM products as p
+    RIGHT JOIN departments as d
+    ON p.department_id = d.department_id
+    GROUP BY d.department_id, d.department_name, d.department_name
 

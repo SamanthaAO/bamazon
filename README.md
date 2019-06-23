@@ -41,4 +41,4 @@ type in node followed by supervisor.js
 View Product Sales by Department
 Create New Department
 
-![supervisor info stock](video/supervisor.mp4)
+![supervisor info](video/supervisor3.gif)

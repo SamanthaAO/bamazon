@@ -1,9 +1,13 @@
+//initiates node packages
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 require("dotenv").config();
+
+//creates global variables
 var key = require("./keys.js");
 var password = key.password.password;
 
+//connects to sql server
 var connection = mysql.createConnection({
     host: "localhost",
 
@@ -18,12 +22,14 @@ var connection = mysql.createConnection({
     database: "bamazonDB"
 });
 
+//when connected will then run show menu to show the manager possible options
 connection.connect(function (err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId + "\n");
     showMenu();
 });
 
+//shows manager options to choose from
 function showMenu() {
 
     inquirer
@@ -59,7 +65,7 @@ function showMenu() {
         })
 }
 
-
+//shows all products in MySql
 function readProducts() {
     console.log("Selecting all products...\n");
     connection.query("SELECT * FROM products", function (err, res) {
@@ -71,6 +77,7 @@ function readProducts() {
     });
 }
 
+//displays products in correct format
 function displayAll(res) {
     var itemArray = [];
     res.forEach(function (element) {
@@ -82,11 +89,13 @@ function displayAll(res) {
     return itemArray;
 }
 
+//adds price symbol
 function priceSymbol(x) {
     var price = new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(x);
     return price;
 }
 
+//shows products with low inventory
 function readLowInventory() {
     console.log("Selecting products with low inventory...\n");
     connection.query("SELECT * FROM products WHERE stock_quantity < 5", function (err, res) {
@@ -98,6 +107,7 @@ function readLowInventory() {
     });
 };
 
+//manager choses item that they would like to update
 function identifyItem() {
     console.log("Selecting all products...\n");
     connection.query("SELECT * FROM products", function (err, res) {
@@ -132,7 +142,7 @@ function identifyItem() {
                         chosenItem = res[i];
                     }
                 }
-                //console.log(chosenItem);
+                
 
                 updateInventory(answer);
 
@@ -141,11 +151,9 @@ function identifyItem() {
 
     });
 
-
-
-
 };
 
+//confirms amount added to stock is a correct number
 function validateNumber(answer) {
 
     var reg = /^\d+$/;
@@ -153,6 +161,7 @@ function validateNumber(answer) {
 
 }
 
+//the stock is added to the item in sql
 function updateInventory(answer) {
     connection.query(
         "UPDATE products SET ? WHERE ?",
@@ -173,7 +182,7 @@ function updateInventory(answer) {
 }
 
 
-
+//manager adds new product
 function updateProducts() {
 
     var departmentArray = [];
@@ -235,7 +244,7 @@ function updateProducts() {
 };
 
 
-
+//manager is asked after they complete their action if they would liek to complete another action or close session
 function anotherAction() {
 
     inquirer

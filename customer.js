@@ -38,13 +38,13 @@ connection.connect(function (err) {
 //displays all the possible products to user
 function readProducts() {
     console.log("Selecting all products...\n");
-    //selects all iteems from products
+    //selects all items from products
     connection.query("SELECT * FROM products", function (err, res) {
         //displays all the products
         displayAll(res);
         //updates definition of itemlist so that we know the length of numbeers for validation
         itemList = res.length;
-        
+
         if (err) throw err;
 
         //inquirer asks for id# and quantity
@@ -69,34 +69,33 @@ function readProducts() {
             ])
             .then(function (answer) {
                 var chosenItem;
-                //runs though the results and 
+                //runs though the items and finds the item that matches the answer collected
                 for (var i = 0; i < res.length; i++) {
                     if (res[i].item_id == answer.IDPurchased) {
                         chosenItem = res[i];
                     }
                 }
-                //console.log(chosenItem);
 
+                //checks to see if there is enough stock to fill the order
                 if (chosenItem.stock_quantity >= answer.quantityPurchased) {
                     var total = priceSymbol(chosenItem.price * answer.quantityPurchased)
                     console.log("Congratulations you have purchased " + answer.quantityPurchased + " " + chosenItem.product_name + "s. Your total comes to " + total + ".");
                     updateProducts(chosenItem, answer);
-                    //console.log(chosenItem)
+
 
                 }
+
+                //if there is not enough stock
                 else {
                     console.log("I am so sorry for the inconvienience, but we do not currently have the stock to fill you order of " + chosenItem.product_name + "s.")
                     anotherPurchase();
                 }
 
-
             });
-
-        //console.log(res[i].item_id + ": " + res[i].product_name);
-
     });
 }
 
+//displays all items
 function displayAll(res) {
     res.forEach(function (element) {
         var price = priceSymbol(element.price)
@@ -106,12 +105,13 @@ function displayAll(res) {
 
 }
 
-
+//makes it so that the japanese yen is used for currency
 function priceSymbol(x) {
     var price = new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(x);
     return price;
 }
 
+//validates that input is a number
 function validateNumber(answer) {
 
     var reg = /^\d+$/;
@@ -119,6 +119,7 @@ function validateNumber(answer) {
 
 }
 
+//validates that input is an id on the list and is a number
 function validateIDOnList(answer) {
 
     if (isNaN(answer) === false && parseInt(answer) > 0 && parseInt(answer) <= itemList) {
@@ -127,7 +128,9 @@ function validateIDOnList(answer) {
     return "Please input a number that is on the list!";
 }
 
+//updates products available in mySql after products and salees are purchsed
 function updateProducts(chosenItem, answer) {
+    //updates products
     connection.query(
         "UPDATE products SET ? WHERE ?",
         [
@@ -144,6 +147,7 @@ function updateProducts(chosenItem, answer) {
             anotherPurchase();
         }
     );
+    //updates sales
     connection.query(
         "UPDATE products SET ? WHERE ?",
         [
@@ -161,6 +165,7 @@ function updateProducts(chosenItem, answer) {
     );
 }
 
+//askes the customer if they would liek to make another purchase or end the session.
 function anotherPurchase() {
 
     inquirer
